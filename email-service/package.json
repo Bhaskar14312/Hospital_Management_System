@@ -1,0 +1,13 @@
+{
+  "name": "hms-email-service",
+  "version": "1.0.0",
+  "description": "Serverless offline email notification service for HMS",
+  "main": "handler.py",
+  "scripts": {
+    "start": "npx serverless offline"
+  },
+  "devDependencies": {
+    "serverless": "^3.38.0",
+    "serverless-offline": "^13.3.3"
+  }
+}

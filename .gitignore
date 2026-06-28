@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Django
+*.sqlite3
+*.log
+local_settings.py
+
+# Environment Variables (KEEP SECRET)
+.env
+*.env
+
+# Node / Serverless
+email-service/node_modules/
+email-service/.serverless/
+email-service/package-lock.json
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

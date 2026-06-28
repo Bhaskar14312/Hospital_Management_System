@@ -1,0 +1,150 @@
+{% extends 'hms_app/base.html' %}
+
+{% block title %}Doctor Dashboard - Banao HMS{% endblock %}
+
+{% block extra_css %}
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+}
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.sync-card {
+    background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent);
+}
+.warning-box {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 6px;
+    padding: 1rem;
+    font-size: 0.85rem;
+    color: #fcd34d;
+    margin-top: 1rem;
+    line-height: 1.4;
+}
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <!-- Left Column: Settings and Creation -->
+    <div>
+        <!-- Google Calendar Integration -->
+        <div class="card sync-card">
+            <div class="card-header" style="border-bottom: none; margin-bottom: 0.5rem; padding-bottom: 0;">
+                <h3 class="card-title">Calendar Sync</h3>
+            </div>
+            {% if is_google_connected %}
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; margin-top: 1rem;">
+                    <span class="badge badge-success" style="padding: 0.4rem 0.8rem;">Enabled ✓</span>
+                    <a href="{% url 'disconnect_google' %}" class="btn btn-danger" style="padding: 0.3rem 0.7rem; font-size: 0.8rem;">Disconnect</a>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                    Your confirmed patient bookings will automatically sync as events to your Google Calendar.
+                </p>
+            {% else %}
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; margin-top: 0.5rem;">
+                    <span class="badge badge-secondary" style="padding: 0.4rem 0.8rem;">Inactive</span>
+                    <span style="font-size: 0.75rem; color: var(--text-secondary);">OAuth Integration</span>
+                </div>
+                
+                {% if google_configured %}
+                    <a href="{% url 'connect_google' %}" class="btn btn-success" style="width: 100%;">Connect Google Calendar</a>
+                {% else %}
+                    <div style="padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid var(--card-border);">
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 0.75rem;">
+                            Automated 2-way Google Calendar synchronization requires OAuth client configuration.
+                        </p>
+                        <button class="btn btn-secondary" style="width: 100%; font-size: 0.85rem;" disabled>Setup Integration</button>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <!-- Create Availability Slot -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Set Availability</h3>
+            </div>
+            <form method="post" action="{% url 'create_slot' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label" for="date">Date</label>
+                    <input type="date" name="date" id="date" required class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="start_time">Start Time</label>
+                    <input type="time" name="start_time" id="start_time" required class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="end_time">End Time</label>
+                    <input type="time" name="end_time" id="end_time" required class="form-control">
+                </div>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 0.5rem;">Create Time Slot</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Right Column: Availability & Bookings -->
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">My Availability & Appointments</h3>
+            </div>
+            {% if slots %}
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time Window</th>
+                                <th>Status</th>
+                                <th>Patient Booking Info</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for slot in slots %}
+                                <tr>
+                                    <td style="font-weight: 500;">{{ slot.date }}</td>
+                                    <td>{{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}</td>
+                                    <td>
+                                        {% if slot.is_booked %}
+                                            <span class="badge badge-success">Booked</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">Available</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if slot.is_booked and slot.booking %}
+                                            <div>
+                                                <strong>{{ slot.booking.patient.get_full_name|default:slot.booking.patient.username }}</strong>
+                                                <div style="font-size: 0.75rem; color: var(--text-secondary);">
+                                                    Email: {{ slot.booking.patient.email }}
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <span style="color: var(--text-secondary); font-size: 0.85rem;">—</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p style="color: var(--text-secondary); text-align: center; padding: 2rem 0;">
+                    No availability slots created yet. Use the sidebar to set your available hours.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Set min date of availability slot selector to today
+    document.getElementById('date').min = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}

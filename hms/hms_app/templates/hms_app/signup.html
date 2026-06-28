@@ -1,0 +1,61 @@
+{% extends 'hms_app/base.html' %}
+
+{% block title %}Sign Up - Banao HMS{% endblock %}
+
+{% block extra_css %}
+.auth-container {
+    max-width: 480px;
+    margin: 3rem auto;
+}
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+.auth-footer a {
+    color: var(--primary);
+    text-decoration: none;
+}
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+.helptext {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Create Account</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">Sign up to book slots or manage availability</p>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-group">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <span class="helptext">{{ field.help_text }}</span>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <span style="color: var(--error); font-size: 0.8rem; display: block; margin-top: 0.25rem;">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn" style="width: 100%; margin-top: 1rem; padding: 0.75rem;">Register Account</button>
+        </form>
+    </div>
+    <div class="auth-footer">
+        Already have an account? <a href="{% url 'login' %}">Log in here</a>
+    </div>
+</div>
+{% endblock %}

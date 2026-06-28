@@ -1,0 +1,17 @@
+service: hms-email-service
+
+provider:
+  name: aws
+  runtime: python3.12
+  region: us-east-1
+
+plugins:
+  - serverless-offline
+
+functions:
+  sendEmail:
+    handler: handler.send_email
+    events:
+      - http:
+          path: send-email
+          method: post

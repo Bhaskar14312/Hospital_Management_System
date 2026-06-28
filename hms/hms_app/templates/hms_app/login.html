@@ -1,0 +1,52 @@
+{% extends 'hms_app/base.html' %}
+
+{% block title %}Login - Banao HMS{% endblock %}
+
+{% block extra_css %}
+.auth-container {
+    max-width: 420px;
+    margin: 4rem auto;
+}
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+.auth-footer a {
+    color: var(--primary);
+    text-decoration: none;
+}
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Welcome Back</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">Log in to access your HMS dashboard</p>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label" for="id_username">Username</label>
+                <input type="text" name="username" autofocus required id="id_username" class="form-control" placeholder="Enter your username">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="id_password">Password</label>
+                <input type="password" name="password" required id="id_password" class="form-control" placeholder="Enter your password">
+            </div>
+            
+            <button type="submit" class="btn" style="width: 100%; margin-top: 1rem; padding: 0.75rem;">Sign In</button>
+        </form>
+    </div>
+    <div class="auth-footer">
+        Don't have an account? <a href="{% url 'signup' %}">Sign up here</a>
+    </div>
+</div>
+{% endblock %}
